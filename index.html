@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffffff">
+<title>Coin On The Line</title>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#FE2C55;--cyan:#25F4EE;--ink:#161823;--gray:#F1F1F2;--muted:#A8A8AD;--sub:#4A4C55}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#E9E9EB;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
+body{display:flex;justify-content:center;font-family:'TikTok Sans',Helvetica,system-ui,sans-serif;color:var(--ink);user-select:none;-webkit-user-select:none}
+button,input{font-family:inherit;border:0}button{cursor:pointer}button:active{transform:scale(.97)}input:focus{outline:none}
+.app{width:min(100%,430px,max(360px,calc(100dvh * .462)));height:100dvh;display:flex;flex-direction:column;background:#fff;position:relative;overflow:hidden;container-type:inline-size}
+.bg{position:absolute;inset:0;filter:blur(60px);opacity:.3;transition:opacity .4s;pointer-events:none}
+.bg i{position:absolute;aspect-ratio:1;border-radius:50%;animation:14s ease-in-out infinite}
+.bg i:nth-child(1){width:70%;background:var(--cyan);animation-name:b1}
+.bg i:nth-child(2){width:60%;background:var(--pink);animation-name:b2}
+.bg i:nth-child(3){width:50%;background:#F5B700;opacity:.6;animation-name:b3}
+@keyframes b1{0%,100%{transform:translate(-30%,-20%)}50%{transform:translate(40%,30%) scale(1.4)}}
+@keyframes b2{0%,100%{transform:translate(50%,60%) scale(1.2)}50%{transform:translate(-20%,10%) scale(.9)}}
+@keyframes b3{0%,100%{transform:translate(10%,120%)}50%{transform:translate(60%,40%) scale(1.3)}}
+.main{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;position:relative}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:40px}
+.logo{font-weight:900;font-size:clamp(17px,4.8cqw,21px);text-shadow:-1.5px -1px 0 var(--cyan),1.5px 1px 0 var(--pink)}
+.bal{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:999px;background:rgba(255,255,255,.7);font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+
+/* Изменено: Стиль монетки заменен на изображение по вашей ссылке */
+.coin{border-radius:50%;background:url('https://i.ibb.co/9mNm5Lpx/photo-2026-10-27-15-43-37.jpg') center/cover no-repeat;border:0 !important;display:flex;align-items:center;justify-content:center;color:transparent}
+
+.bal .coin{width:26px;height:26px;border-width:2px}
+.hist{display:flex;gap:6px;overflow-x:auto;flex:none;scrollbar-width:none}
+.hist span{flex:none;padding:5px 11px;border-radius:999px;font-weight:700;font-size:13px;background:rgba(255,255,255,.7)}
+.stage{flex:1;min-height:0;position:relative;border-radius:24px;overflow:hidden;background:rgba(241,241,242,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;flex-direction:column;align-items:center;padding-top:clamp(36px,6vh,56px);gap:4px}
+.live{position:absolute;left:14px;top:14px;background:var(--pink);color:#fff;font-weight:800;font-size:12px;padding:4px 8px;border-radius:6px}
+#mult{font-weight:900;font-size:clamp(52px,min(24cqw,12vh),124px);line-height:.95;letter-spacing:-.04em;font-variant-numeric:tabular-nums;z-index:2}
+#pill{font-weight:900;font-size:clamp(20px,min(7cqw,4.5vh),32px);padding:2px 14px;border-radius:10px;z-index:2}
+#caption{font-weight:600;font-size:14px;color:var(--sub);z-index:2}
+.chart{position:absolute;left:56px;right:56px;top:58%;bottom:48px;transition:top .3s}
+.chart svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#tip{position:absolute;transform:translate(-50%,-50%);width:clamp(52px,min(21cqw,11vh),96px);aspect-ratio:1}
+#tip .coin{position:absolute;inset:0;font-size:clamp(24px,min(9cqw,5vh),44px)}
+#btn{flex:none;min-height:clamp(54px,8.5vh,68px);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+#btnLabel{font-weight:900;font-size:clamp(20px,5.6cqw,24px);font-variant-numeric:tabular-nums}
+#btnSub{font-weight:600;font-size:12px;opacity:.75}
+.tabs{flex:none;display:flex;border-top:1px solid #EDEDEE;background:#fff;padding:6px 8px calc(env(safe-area-inset-bottom) + 6px);position:relative}
+.tabs div{flex:1;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:700;font-size:11px;color:var(--muted)}
+.tabs div::before{content:"";width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor}
+.tabs div:first-child{color:var(--ink)}.tabs div:first-child::before{background:var(--pink)}
+.wallet{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;background:#F4F4F5}
+.whead{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:calc(env(safe-area-inset-top) + 14px) 12px 14px;font-weight:800;font-size:20px;text-align:center}
+.whead b{font-size:30px;font-weight:600;line-height:1}
+.wcard{background:#fff;border-radius:16px;margin:0 12px 14px;padding:20px}
+.wcard h3{margin:0 0 14px;font-size:17px;font-weight:600}
+.wbal{display:flex;align-items:center;gap:10px;font-weight:900;font-size:44px;font-variant-numeric:tabular-nums}
+.wbal .coin{width:44px;height:44px;font-size:20px;border-width:3px}
+.pk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pk button{min-height:76px;border-radius:12px;background:var(--gray);border:2px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink)}
+.pk button.on{background:#FFF0F3;border-color:var(--pink)}
+.pk b{display:flex;align-items:center;gap:5px;font-size:19px;font-weight:800}
+.pk b .coin{width:18px;height:18px;border-width:2px}
+.pk small{font-size:13px;color:#8A8B91;font-weight:500}
+.wscroll{flex:1;min-height:0;overflow-y:auto}
+.wfoot{flex:none;background:#fff;padding:12px 16px calc(env(safe-area-inset-bottom) + 16px)}
+.wfoot button{width:100%;min-height:56px;border-radius:999px;background:var(--pink);color:#fff;font-weight:700;font-size:19px}
+.modal{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:20px}
+.card{width:100%;max-width:420px;background:#fff;border-radius:28px;padding:calc(clamp(72px,14vh,108px)/2 + 18px) 24px 24px;margin-top:calc(clamp(72px,14vh,108px)/2);position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2.5vh,20px);text-align:center;box-shadow:0 30px 80px rgba(22,24,35,.35)}
+#bigCoin{position:absolute;left:50%;top:0;width:clamp(72px,14vh,108px);aspect-ratio:1;border-width:5px;outline:8px solid #fff;font-size:clamp(34px,6.5vh,52px)}
+.view{display:none;flex-direction:column;align-items:center;gap:inherit;width:100%}
+.glitch{font-weight:900;line-height:.95;text-shadow:-3px -2px 0 var(--cyan),3px 2px 0 var(--pink)}
+.muted{font-weight:600;font-size:16px;color:var(--sub)}
+#count{font-weight:900;font-size:clamp(44px,min(19cqw,11vh),88px);line-height:1;font-variant-numeric:tabular-nums;color:var(--pink)}
+#form{display:none;flex-direction:column;gap:12px;width:100%}
+#nick{width:100%;min-height:56px;padding:0 16px;border-radius:14px;background:var(--gray);font-weight:700;font-size:18px;color:var(--ink);text-align:center}
+.big{width:100%;min-height:58px;border-radius:16px;font-weight:900;font-size:20px;color:#fff}
+.bar{width:100%;height:14px;border-radius:7px;background:var(--gray);overflow:hidden}
+#barFill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink))}
+.confetti{position:absolute;border-radius:2px;z-index:2;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg" id="bg"><i></i><i></i><i></i></div>
+  <div class="main">
+    <div class="top"><div class="logo">COIN ON THE LINE</div><div class="bal"><div class="coin"></div><span id="balance">1,000</span></div></div>
+    <div class="hist" id="hist"></div>
+    <div class="stage" id="stage">
+      <div class="live">LIVE</div>
+      <div id="mult">×1.00</div>
+      <div id="pill">READY</div>
+      <div id="caption">tap START and watch it fly</div>
+      <div class="chart" id="chart">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="area" fill-opacity=".12"/><path id="line" fill="none" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+        <div id="tip"><div class="coin" id="coinA">$</div><div class="coin" id="coinB" style="display:none">$</div></div>
+      </div>
+    </div>
+    <button id="btn"><div id="btnLabel">START</div><div id="btnSub">launch the coin</div></button>
+  </div>
+  <div class="tabs"><div>Play</div><div>Top</div><div>Prizes</div><div>Me</div></div>
+
+  <div class="wallet" id="wallet">
+    <div class="whead"><b>‹</b><span>Get Coins</span><span></span></div>
+    <div class="wscroll"><div class="wcard"><h3>Coin balance</h3><div class="wbal"><div class="coin">$</div><span id="wCount">0</span></div></div>
+    <div class="wcard"><h3>Recharge</h3><div class="pk" id="packs"></div></div></div>
+    <div class="wfoot"><button id="recharge">Recharge</button></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="card" id="card">
+      <div class="coin" id="bigCoin">$</div>
+      <div class="view" id="vCongrats">
+        <div class="glitch" style="font-size:clamp(32px,min(12cqw,8vh),56px)">CONGRATS!</div>
+        <div class="muted">You took home</div>
+        <div id="count">0</div>
+        <div id="form">
+          <div class="muted" style="font-size:15px">Enter your nickname to claim your prize.</div>
+          <input id="nick" placeholder="@your nickname" maxlength="24" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button class="big" id="claim" style="background:var(--muted)">CLAIM PRIZE</button>
+        </div>
+      </div>
+      <div class="view" id="vLoading">
+        <div class="muted nickOut"></div>
+        <div style="font-weight:900;font-size:clamp(24px,7cqw,30px)" id="loadStep">Verifying account…</div>
+        <div class="bar"><div id="barFill"></div></div>
+        <div style="font-weight:800;font-size:18px" id="loadPct">0%</div>
+      </div>
+      <div class="view" id="vPrank">
+        <div class="muted nickOut"></div>
+        <div class="glitch" id="prankText" style="font-size:clamp(40px,12cqw,56px)">BRO,<br>YOU GOT<br>PRANKED</div>
+        <div class="muted">no prize. the coin wasn't real either.</div>
+        <button class="big" id="again" style="background:var(--ink);box-shadow:-3px -3px 0 var(--cyan),3px 3px 0 var(--pink)">PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CRASH = 7.19;                       // where the coin busts
+const K = Math.log(7.19) / 3.5;           // growth: reaches ×7.19 in 3.5s
+const PINK = '#FE2C55', CYAN = '#25F4EE', INK = '#161823', GRAY = '#F1F1F2', MUTED = '#A8A8AD';
+const $ = id => document.getElementById(id);
+const fmt = n => Math.floor(n).toLocaleString('en-US');
+const x2 = m => '×' + m.toFixed(2);
+const buzz = p => navigator.vibrate && navigator.vibrate(p);
+const CLIP = ['polygon(0 0,52% 0,40% 30%,58% 52%,44% 74%,54% 100%,0 100%)', 'polygon(52% 0,100% 0,100% 100%,54% 100%,44% 74%,58% 52%,40% 30%)'];
+
+let S;
+function reset() {
+  S = { phase: 'idle', screen: 'game', balance: 1000, history: [1.12, 5.2, 1.86, 13.4, 1.03, 3.07], cashedAt: 0, win: 0, t0: 0, crashT: 0, sceneT: 0 };
+  $('nick').value = ''; $('claim').style.background = MUTED;
+  renderHistory(); showScreen('game');
+}
+function renderHistory() {
+  $('hist').innerHTML = S.history.slice(0, 12).map(h =>
+    `<span style="background:${h >= 5 ? PINK : h >= 2 ? CYAN : 'rgba(255,255,255,.7)'};color:${h >= 5 ? '#fff' : INK}">${x2(h)}</span>`).join('');
+}
+function showScreen(name) {
+  S.screen = name; S.sceneT = performance.now();
+  $('modal').style.display = ['congrats', 'loading', 'prank'].includes(name) ? 'flex' : 'none';
+  $('wallet').style.display = name === 'wallet' || name === 'prank' ? 'flex' : 'none';
+  $('vCongrats').style.display = name === 'congrats' ? 'flex' : 'none';
+  $('vLoading').style.display = name === 'loading' ? 'flex' : 'none';
+  $('vPrank').style.display = name === 'prank' ? 'flex' : 'none';
+  $('form').style.display = 'none';
+  document.querySelectorAll('.nickOut').forEach(n => n.textContent = '@' + $('nick').value);
+  document.querySelectorAll('.confetti').forEach(c => c.remove());
+  if (name === 'congrats') spawnConfetti();
+}
+
+let conf = [];
+function spawnConfetti() {
+  conf = Array.from({ length: 100 }, (_, i) => {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    const w = 6 + Math.random() * 5;
+    Object.assign(el.style, { width: w + 'px', height: w * 1.6 + 'px', background: [CYAN, PINK, INK, '#F5B700'][i % 4] });
+    $('modal').appendChild(el);
+    return { el, vx: Math.random() * 110 - 55, vy: -40 - Math.random() * 70, r: Math.random() * 360, vr: Math.random() * 900 - 450, d: i % 3 ? 0 : 0.9 };
+  });
+}
+
+$('btn').onclick = () => {
+  if (S.phase === 'running') {
+    if (S.cashedAt) return;
+    const m = Math.exp(K * (performance.now() - S.t0) / 1000);
+    S.cashedAt = m; S.win = Math.floor(100 * m); S.balance += S.win;
+    buzz(30); showScreen('congrats');
+  } else {
+    Object.assign(S, { phase: 'running', t0: performance.now(), cashedAt: 0, win: 0 });
+  }
+};
+$('nick').oninput = e => { e.target.value = e.target.value.replace(/[@\s]/g, ''); $('claim').style.background = e.target.value ? PINK : MUTED; };
+$('claim').onclick = () => { if ($('nick').value) { $('nick').blur(); showScreen('loading'); } };
+$('again').onclick = reset;
+$('recharge').onclick = () => showScreen('prank');
+const PACKS = [[20, '0.39'], [70, '1.29'], [350, '6.00'], [700, '12.00'], [1400, '24.00'], [3500, '60.00'], [7000, '120.99'], [17500, '300.00']];
+$('packs').innerHTML = PACKS.map(([c, p], i) => `<button class="${i ? '' : 'on'}"><b><span class="coin"></span>${fmt(c)}</b><small>$${p}</small></button>`).join('');
+$('packs').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('packs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); };
+
+function frame(now) {
+  const run = S.phase === 'running';
+  let over = S.phase === 'over';
+  let t = run ? (now - S.t0) / 1000 : 0;
+  if (run && t >= Math.log(CRASH) / K) {
+    S.phase = 'over'; S.crashT = now; over = true;
+    S.history.unshift(CRASH); renderHistory(); buzz([40, 30, 60]);
+  }
+  if (over) t = Math.log(CRASH) / K;
+  const m = over ? CRASH : Math.exp(K * t);
+  const lost = over && !S.cashedAt, hot = run && !over && !S.cashedAt && m >= 3;
+  const age = over ? (now - S.crashT) / 1000 : 0, e = 1 - Math.pow(1 - Math.min(1, age / 0.35), 3);
+
+  // stage
+  $('bg').style.opacity = run && !over ? .55 : .3;
+  $('stage').style.transform = `translateX(${over && age < .45 ? Math.sin(age * 70) * 8 * (1 - age / .45) : 0}px)`;
+  $('stage').style.boxShadow = hot ? `inset 0 0 0 3px ${PINK}` : 'none';
+  $('mult').textContent = x2(m);
+  $('mult').style.color = over ? MUTED : hot ? PINK : INK;
+  $('mult').style.textShadow = over ? 'none' : `-4px -3px 0 ${CYAN}, 4px 3px 0 ${hot ? 'transparent' : PINK}`;
+  const pill = $('pill');
+  pill.textContent = lost ? 'BUSTED' : S.cashedAt ? 'YOU WON +' + fmt(S.win) : run ? fmt(100 * m) : 'READY';
+  pill.style.background = lost ? PINK : S.cashedAt ? CYAN : 'transparent';
+  pill.style.color = lost ? '#fff' : hot ? PINK : INK;
+  pill.style.transform = over ? 'rotate(-3deg)' : 'none';
+  $('caption').textContent = lost ? 'tap faster next time' : over ? `took ${x2(S.cashedAt)} · busted ${x2(CRASH)}` : run ? 'coins' : 'tap START and watch it fly';
+
+  // chart
+  const tMax = Math.max(t * 1.08, 5), mMax = Math.max(m * 1.08, 2);
+  const X = v => v / tMax * 100, Y = v => 100 - (v - 1) / (mMax - 1) * 100;
+  const pts = Array.from({ length: 41 }, (_, i) => X(t * i / 40).toFixed(1) + ',' + Y(Math.exp(K * t * i / 40)).toFixed(1));
+  const line = 'M' + pts.join(' L'), col = over ? MUTED : S.cashedAt ? INK : PINK;
+  $('line').setAttribute('d', line); $('line').setAttribute('stroke', col);
+  $('area').setAttribute('d', line + ` L${X(t).toFixed(1)},100 L0,100 Z`); $('area').setAttribute('fill', col);
+  $('chart').style.top = over ? '68%' : '58%';
+  $('tip').style.left = X(t) + '%'; $('tip').style.top = Y(m) + '%';
+  const a = $('coinA'), b = $('coinB');
+  b.style.display = over ? 'flex' : 'none';
+  a.style.clipPath = over ? CLIP[0] : 'none';
+  b.style.clipPath = CLIP[1];
+  a.style.transform = over ? `translate(${-12 * e}px,${-3 * e}px) rotate(${-12 * e}deg)` : `scaleX(${run ? Math.max(.12, Math.abs(Math.cos(t * 9))) : 1})`;
+  b.style.transform = `translate(${12 * e}px,${-3 * e}px) rotate(${14 * e}deg)`;
+
+  // button
+  const [label, sub, bg] = run && !over && !S.cashedAt ? ['FLYING… ' + x2(m), 'tap to take +' + fmt(100 * m), PINK]
+    : S.cashedAt ? ['TAKEN +' + fmt(S.win), 'nice timing', GRAY]
+    : lost ? ['TRY AGAIN', 'the coin busted', INK] : ['START', 'launch the coin', INK];
+  $('btnLabel').textContent = label; $('btnSub').textContent = sub;
+  $('btn').style.background = bg; $('btn').style.color = bg === GRAY ? INK : '#fff';
+  $('btn').style.boxShadow = bg === INK ? `-3px -3px 0 ${CYAN}, 3px 3px 0 ${PINK}` : hot ? `0 0 0 4px ${CYAN}` : 'none';
+
+  // modal
+  const el = (now - S.sceneT) / 1000;
+  if (S.screen === 'congrats') {
+    const cp = Math.min(1, el / 2), pp = Math.min(1, el / .25);
+    $('modal').style.background = `rgba(22,24,35,${.4 * pp})`;
+    $('card').style.transform = `scale(${0.6 + 0.4 * (1 + 2.7 * Math.pow(pp - 1, 3) + 1.7 * Math.pow(pp - 1, 2))})`;
+    $('bigCoin').style.transform = `translate(-50%,-50%) scaleX(${cp < 1 ? Math.max(.12, Math.abs(Math.cos(cp * 30))) : 1})`;
+    $('count').textContent = fmt(S.win * (1 - Math.pow(1 - cp, 3)));
+    if (cp >= 1 && $('form').style.display === 'none') { $('form').style.display = 'flex'; buzz(30); }
+    conf.forEach(c => {
+      const ct = Math.max(0, el - c.d), s = c.el.style;
+      s.left = 50 + c.vx * ct + '%'; s.top = 36 + c.vy * ct + 80 * ct * ct + '%';
+      s.opacity = ct ? Math.max(0, 1 - Math.max(0, ct - 2.4) / .8) : 0;
+      s.transform = `rotate(${c.r + c.vr * ct}deg) scaleX(${Math.cos(ct * 8 + c.r)})`;
+    });
+  } else {
+    $('modal').style.background = 'rgba(22,24,35,.55)';
+    $('card').style.transform = 'none';
+    $('bigCoin').style.transform = 'translate(-50%,-50%)';
+  }
+  if (S.screen === 'loading') {
+    const p = Math.min(1, el / 2);
+    $('barFill').style.width = p * 100 + '%';
+    $('loadPct').textContent = Math.round(p * 100) + '%';
+    $('loadStep').textContent = ['Verifying account…', 'Counting coins…', 'Crediting prize…', 'Almost there…'][Math.min(3, Math.floor(el * 2))];
+    if (el > 2.2) showScreen('wallet');
+  }
+  if (S.screen === 'wallet') {
+    const p = Math.min(1, Math.max(0, el - .3) / 1.5);
+    $('wCount').textContent = fmt(S.win * (1 - Math.pow(1 - p, 3)));
+  }
+  if (S.screen === 'prank') {
+    $('prankText').style.transform = el < .6 ? `scale(${Math.max(1, 1.4 - el * 1.6)}) rotate(${Math.sin(el * 50) * 4 * (1 - el / .6)}deg)` : 'none';
+  }
+  $('balance').textContent = fmt(S.balance);
+  requestAnimationFrame(frame);
+}
+
+reset();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
